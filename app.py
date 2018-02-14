@@ -45,10 +45,10 @@ def cg1d():
     _main_path = os.path.abspath(os.path.dirname(__file__))
     _path_to_beam_shape = os.path.join(_main_path, 'static/instrument_file/beam_shape_cg1d.txt')
     df = load_beam_shape(_path_to_beam_shape)
-    o_reso = init_reso(e_min=0.00025,
-                       e_max=0.12525,
-                       e_step=0.000625)
     if request.method == 'POST' and sample_form.validate():
+        o_reso = init_reso(e_min=0.00025,
+                           e_max=0.12525,
+                           e_step=0.000625)
         o_reso.add_layer(sample_form.formula.data,
                          sample_form.thickness.data,
                          sample_form.density.data)
