@@ -1,4 +1,3 @@
-# from model import InputForm
 from model import InitForm
 from model import SampleForm
 from flask import Flask, render_template, request
@@ -9,11 +8,7 @@ import os
 import matplotlib.pyplot as plt
 import base64
 from scipy.interpolate import interp1d
-import pprint
 
-
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-from matplotlib.figure import Figure
 
 app = Flask(__name__)
 
@@ -23,13 +18,7 @@ def index():
     init_form = InitForm(request.form)
     sample_form = SampleForm(request.form)
     if request.method == 'POST':
-        # if request.method == 'POST' and form.validate():
-        #     o_reso = init_reso(form.e_min.data,
-        #                        form.e_max.data,
-        #                        form.e_step.data)
-        #     o_reso.add_layer(form.formula.data,
-        #                      form.thickness.data,
-        #                      form.density.data)
+
         if init_form.validate() and sample_form.validate():
             o_reso = init_reso(init_form.e_min.data,
                                init_form.e_max.data,
@@ -63,12 +52,13 @@ def cg1d():
         o_reso.add_layer(sample_form.formula.data,
                          sample_form.thickness.data,
                          sample_form.density.data)
-        # interpolate with the beam shape energy
+        # interpolate with the beam shape energy ()
+        interp_type = 'cubic'
         energy = o_reso.total_signal['energy_eV']
         trans = o_reso.total_signal['transmission']
-        y_function = interp1d(x=energy, y=trans, kind='cubic')
+        interp_function = interp1d(x=energy, y=trans, kind=interp_type)
         # add interpolated transmission value to beam shape df
-        trans = y_function(df['energy_eV'])
+        trans = interp_function(df['energy_eV'])
         # calculated transmitted flux
         trans_flux = trans * df['flux']
         stack = o_reso.stack
