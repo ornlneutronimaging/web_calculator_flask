@@ -18,7 +18,6 @@
         <h2>Global parameters:</h2><br>
     </div>
     {% for field in init_form %}
-        {#        <dt>{{ field.name }}#}
         <dd>{{ field.label }} {{ field|safe }}
             {% if field.errors %}
                 <ul class=errors>
@@ -49,18 +48,27 @@
     <h4>Stack:</h4>
     <pre>{{ result }}</pre>'
     <p>{{ result }}</p>
-    <pre>{{ stack }}</pre>
-    <p>{{ stack }}</p>
+    <pre>{{ stack.keys() }}</pre>
+    <p>{{ stack.keys() }}</p>
+    {% for layer in stack.keys() %}
+        {{ layer }}
+        <hr>
+{#        {{ stack.layer }}.{{ layer }}.keys()#}
+        current_layer = {{ layer }}<br>
+        {% for element in stack.AgI.keys() %}
+            {{ element }}
+        {% endfor %}
+
+    {% endfor %}
     <hr>
     <h4>Plot:</h4>
-    <div id="myDiv"><!-- Plotly chart will be drawn inside this DIV --></div>
+    <div id="plotDiv"><!-- Plotly chart will be drawn inside this DIV --></div>
     <script type="text/javascript">
         var graphs = {{out | safe}};
 
-        Plotly.plot('myDiv', graphs.data, graphs.layout);
+        Plotly.plot('plotDiv', graphs.data, graphs.layout);
     </script>
     <hr>
-    {{ out }}
 {% endif %}
 
 </body>

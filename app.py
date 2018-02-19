@@ -23,10 +23,11 @@ def index():
     sample_form = SampleForm(request.form)
     if request.method == 'POST':
 
-        if init_form.validate() and sample_form.validate():
+        if init_form.validate():
             o_reso = init_reso(init_form.e_min.data,
                                init_form.e_max.data,
                                init_form.e_step.data)
+        if sample_form.validate():
             o_reso.add_layer(sample_form.formula.data,
                              sample_form.thickness.data,
                              sample_form.density.data)

@@ -1,4 +1,5 @@
-from wtforms import Form, FloatField, validators, StringField
+from wtforms import Form, FloatField, validators, StringField, FileField
+from flask_wtf import FlaskForm
 import numpy as np
 
 
