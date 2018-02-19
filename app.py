@@ -1,19 +1,23 @@
 from model import InitForm
 from model import SampleForm
-from flask import Flask, render_template, request
+import flask
+from flask import render_template, request
 from compute import init_reso, add_layer, load_beam_shape
-
 import io
 import os
 import matplotlib.pyplot as plt
 import base64
 from scipy.interpolate import interp1d
+import dash
+import pprint
+import plotly
+import json
+
+app_flask = flask.Flask(__name__)
+# app_dash = dash.Dash(__name__, server=app_flask, url_base_pathname='/dash_plot')
 
 
-app = Flask(__name__)
-
-
-@app.route('/', methods=['GET', 'POST'])
+@app_flask.route('/', methods=['GET', 'POST'])
 def index():
     init_form = InitForm(request.form)
     sample_form = SampleForm(request.form)
@@ -26,20 +30,30 @@ def index():
             o_reso.add_layer(sample_form.formula.data,
                              sample_form.thickness.data,
                              sample_form.density.data)
-        result = o_reso.stack
-        plot = o_reso.plot()
+        stack = o_reso.stack
+        p_stack = pprint.pformat(stack)
+        result = json.dumps(p_stack)
+        plotly_fig = o_reso.plot(all_isotopes=True, plotly=True)
+        plotly_fig.layout.showlegend = True
+        # my_plot_div = plotly.offline.plot(plotly_fig, output_type='div', include_plotlyjs=False)
+        # my_plot_div = plotly.offline.plot(plotly_fig, output_type='div')
+        graph_json = json.dumps(plotly_fig, cls=plotly.utils.PlotlyJSONEncoder)
+        out = graph_json
+
     else:
         result = None
-        plot = None
+        out = None
+        stack = None
 
     return render_template('view_reso.html',
                            init_form=init_form,
                            sample_form=sample_form,
                            result=result,
-                           plot=plot)
+                           out=out,
+                           stack=stack)
 
 
-@app.route('/cg1d', methods=['GET', 'POST'])
+@app_flask.route('/cg1d', methods=['GET', 'POST'])
 def cg1d():
     sample_form = SampleForm(request.form)
     _main_path = os.path.abspath(os.path.dirname(__file__))
@@ -64,7 +78,7 @@ def cg1d():
         stack = o_reso.stack
         # stack = pprint.pformat(o_reso.stack)
 
-        _total_trans = sum(trans_flux)/sum(df['flux'])*100
+        _total_trans = sum(trans_flux) / sum(df['flux']) * 100
         total_trans = round(_total_trans, 3)
     else:
         total_trans = None
@@ -75,7 +89,7 @@ def cg1d():
                            stack=stack)
 
 
-@app.route('/plot')
+@app_flask.route('/plot')
 def build_plot():
     img = io.BytesIO()
 
@@ -91,4 +105,70 @@ def build_plot():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app_flask.run(debug=True)
+
+# # app_dash = dash.Dash(__name__)
+# # server = app.server
+#
+# app_dash.layout = html.Div(children=[
+#     html.H1(children='Hello Dash'),
+#     html.Div([
+#         html.Div(
+#             dcc.Input(id='input_formula',
+#                       name='formula',
+#                       placeholder='Enter chemical formula...',
+#                       type='text',
+#                       value='',
+#                       ),
+#             # dcc.Input(id='input_thickness',
+#             #           name='thickness',
+#             #           placeholder='Enter thickness (mm)...',
+#             #           type='number',
+#             #           value='',
+#             #           ),
+#             # dcc.Input(id='input_density',
+#             #           name='density',
+#             #           placeholder='Enter density (g/cm3)...',
+#             #           type='number',
+#             #           value='',
+#             #           ),
+#         ),
+#         html.Button('Submit', id='button'),
+#         html.Div(id='output-container-button',
+#                  children='Enter a value and press submit')
+#     ])
+#     ,
+#     html.Hr(),
+#     html.Div(children='''
+#             Dash: A web application framework for Python.
+#         '''),
+#
+#     dcc.Graph(
+#         id='example-graph',
+#         figure={
+#             'data': [
+#                 {'x': [1, 2, 3], 'y': [4, 1, 2], 'type': 'bar', 'name': 'SF'},
+#                 {'x': [1, 2, 3], 'y': [2, 4, 5], 'type': 'bar', 'name': u'Montréal'},
+#             ],
+#             'layout': {
+#                 'title': 'Dash Data Visualization'
+#             }
+#         }
+#     )
+# ])
+#
+#
+# @app_dash.callback(
+#     dash.dependencies.Output('output-container-button', 'children'),
+#     [dash.dependencies.Input('button', 'n_clicks')],
+#     [dash.dependencies.State('input_formula', 'value')])
+# def update_output(n_clicks, value):
+#     return 'The input value was "{}" and the button has been clicked {} times'.format(
+#         value,
+#         n_clicks
+#     )
+#
+#
+# @app_flask.route('/dash')
+# def render_dashboard():
+#     return flask.redirect('/dash_plot')

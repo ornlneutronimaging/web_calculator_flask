@@ -1,19 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <meta charset="UTF-8">
     <title>Neutron Resonance Calculator</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 <div style="color:#0000FF">
-    <h2>Sample info input:</h2>
+    <h1>ImagingReso</h1>
     <hr>
 </div>
 
 <form method=post action="">
+    <div>
+        <h2>Global parameters:</h2><br>
+    </div>
     {% for field in init_form %}
-{#        <dt>{{ field.name }}#}
+        {#        <dt>{{ field.name }}#}
         <dd>{{ field.label }} {{ field|safe }}
             {% if field.errors %}
                 <ul class=errors>
@@ -23,6 +28,9 @@
             {% endif %}</dd>
     {% endfor %}
     <hr>
+    <div>
+        <h2>Sample info:</h2><br>
+    </div>
     {% for field in sample_form %}
         <dd>{{ field.label }} {{ field|safe }}
             {% if field.errors %}
@@ -32,12 +40,27 @@
                     {% endfor %}</ul>
             {% endif %}</dd>
     {% endfor %}
-    <input type=submit value=Submit></form>
+    <br>
+    <input type=submit value=Submit>
+    <input type=radio title="eV">
+</form>
 <hr>
 {% if result != None %}
-    <h4>Plot:</h4>
+    <h4>Stack:</h4>
+    <pre>{{ result }}</pre>'
     <p>{{ result }}</p>
-    <img src="{{ plot }}" alt="plot">
+    <pre>{{ stack }}</pre>
+    <p>{{ stack }}</p>
+    <hr>
+    <h4>Plot:</h4>
+    <div id="myDiv"><!-- Plotly chart will be drawn inside this DIV --></div>
+    <script type="text/javascript">
+        var graphs = {{out | safe}};
+
+        Plotly.plot('myDiv', graphs.data, graphs.layout);
+    </script>
+    <hr>
+    {{ out }}
 {% endif %}
 
 </body>

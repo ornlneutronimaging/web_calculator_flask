@@ -7,11 +7,14 @@
 </head>
 <body>
 <div style="color:#0000FF">
-    <h2>Sample info input:</h2>
+    <h1>ImagingReso</h1>
     <hr>
 </div>
 
 <form method=post action="">
+    <div>
+        <h2>Sample info:</h2><br>
+    </div>
     {% for field in sample_form %}
         <dd>{{ field.label }} {{ field|safe }}
             {% if field.errors %}
@@ -21,18 +24,20 @@
                     {% endfor %}</ul>
             {% endif %}</dd>
     {% endfor %}
-    <input type=submit value=Submit></form>
-<hr>
+    <br>
+    <input type=submit value=Submit>
+</form>
+
 {% if total_trans != None %}
+    <hr>
     <p>Sample transmission at CG-1D:</p>
     <p>{{ total_trans }} %</p>
-{#    <img src="{{ plot }}" alt="plot">#}
 {% endif %}
-<hr>
+
 {% if stack != None %}
+    <hr>
     <p>Sample stack info:</p>
     <p>{{ stack }}</p>
-{#    <img src="{{ plot }}" alt="plot">#}
 {% endif %}
 
 </body>
