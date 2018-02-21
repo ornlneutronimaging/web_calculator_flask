@@ -17,7 +17,7 @@ class InitForm(Form):
 
 class SampleForm(Form):
     formula = StringField(
-        label='Chemical formula:', default='Ag',
+        label='Chemical formula:', default='AgI',
         validators=[validators.InputRequired()])
     thickness = FloatField(
         label='Thickness (mm):', default=0.5,
